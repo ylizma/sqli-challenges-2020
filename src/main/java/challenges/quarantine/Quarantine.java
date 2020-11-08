@@ -5,25 +5,24 @@ import java.util.List;
 
 public class Quarantine {
     List<Patient> patients;
-    QuarantineService quarantineService = new QuarantineService();
 
     public Quarantine(String s) {
         patients = new ArrayList<>();
-        Patient patient = null;
         String[] input = s.split(",");
         for (String value : input) {
+            Patient patient = new Patient();
             switch (value) {
                 case "F":
-                    patient = new Patient(new FeverState());
+                    patient.setPatientState(patient.changeToFever());
                     break;
                 case "H":
-                    patient = new Patient(new HealthyState());
+                    patient.setPatientState(patient.changeToHealthy());
                     break;
                 case "D":
-                    patient = new Patient(new DiabeteState());
+                    patient.setPatientState(patient.changeToDiabetes());
                     break;
                 case "T":
-                    patient = new Patient(new TuberculosisState());
+                    patient.setPatientState(patient.changeToTuberculosis());
                     break;
             }
             this.patients.add(patient);
@@ -31,26 +30,77 @@ public class Quarantine {
     }
 
     public String report() {
-        return quarantineService.report(patients);
+        int f = 0, h = 0, d = 0, t = 0, x = 0;
+        for (Patient patient : patients
+        ) {
+            if (patient.getPatientState() instanceof FeverState) {
+                f++;
+            } else if (patient.getPatientState() instanceof HealthyState)
+                h++;
+            else if (patient.getPatientState() instanceof DiabeteState)
+                d++;
+            else if (patient.getPatientState() instanceof TuberculosisState)
+                t++;
+            else if (patient.getPatientState() instanceof DeathState)
+                x++;
+        }
+        return "F:" + f + " H:" + h + " D:" + d + " T:" + t + " X:" + x;
     }
 
     public void aspirin() {
-        quarantineService.aspirin(patients);
+        for (Patient patient : patients
+        ) {
+            if (patient.getMedicines().contains("paracetamol"))
+                patient.setPatientState(patient.changeToDead());
+            else if (patient.getPatientState() instanceof FeverState) {
+                patient.setPatientState(patient.changeToHealthy());
+            }
+            patient.medicines.add("aspirin");
+        }
     }
 
     public void wait40Days() {
-        quarantineService.wait40Days(patients);
+        for (Patient patient : patients
+        ) {
+            if (patient.getPatientState() instanceof DiabeteState
+                    && !patient.getMedicines().contains("insulin")) {
+                patient.setPatientState(patient.changeToDead());
+            }
+        }
     }
 
     public void antibiotic() {
-        quarantineService.antibiotic(patients);
+        for (Patient patient : patients
+        ) {
+            if (patient.getPatientState() instanceof TuberculosisState) {
+                patient.setPatientState(patient.changeToHealthy());
+            } else if (patient.getPatientState() instanceof HealthyState
+                    && patient.getMedicines().contains("insulin")) {
+                patient.setPatientState(patient.changeToFever());
+            }
+            patient.getMedicines().add("antibiotic");
+        }
     }
 
     public void insulin() {
-        quarantineService.insulin(patients);
+        for (Patient patient : patients
+        ) {
+            if (patient.getPatientState() instanceof HealthyState && patient.getMedicines().contains("antibiotic")) {
+                patient.setPatientState(patient.changeToFever());
+            }
+            patient.getMedicines().add("insulin");
+        }
     }
 
     public void paracetamol() {
-        quarantineService.paracetamol(patients);
+        for (Patient patient : patients
+        ) {
+            if (patient.getMedicines().contains("aspirin")) {
+                patient.setPatientState(patient.changeToFever());
+            } else if (patient.getPatientState() instanceof FeverState) {
+                patient.setPatientState(patient.changeToHealthy());
+            }
+            patient.getMedicines().add("paracetamol");
+        }
     }
 }

@@ -39,9 +39,9 @@ public class Playoff {
         this.teamList.sort((o1, o2) -> {
             return Integer.compare(o2.getScore(), o1.getScore());
         });
-        return new String[]{teamList.get(0).getName()+" vs "
-                +teamList.get(3).getName(),teamList.get(1).getName()+" vs "
-                +teamList.get(2).getName()
+        return new String[]{teamList.get(0).getName() + " vs "
+                + teamList.get(3).getName(), teamList.get(1).getName() + " vs "
+                + teamList.get(2).getName()
         };
     }
 }

@@ -192,13 +192,13 @@ public class CloudInfrastructureTest {
         cloud.uploadDocument("myImages", "picture.jpeg");
         assertEquals("myImages:picture.jpeg", cloud.listStores());
 //
-        assertEquals(70.100, cloud.globalUsedDisk(), PRECISION);
+        assertEquals(70, cloud.globalUsedDisk(), PRECISION);
         assertEquals(12, cloud.globalUsedMemory(), PRECISION);
 //
-//        cloud.stopMachine("machine1");
-//        assertEquals(70.100, cloud.globalUsedDisk(), PRECISION);
-//        assertEquals(4, cloud.globalUsedMemory(), PRECISION);
-//
+        cloud.stopMachine("machine1");
+        assertEquals(70.100, cloud.globalUsedDisk(), PRECISION);
+        assertEquals(4, cloud.globalUsedMemory(), PRECISION);
+
 //        cloud.emptyStore("myImages");
 //        assertEquals(70, cloud.globalUsedDisk(), PRECISION);
 //        assertEquals(4, cloud.globalUsedMemory(), PRECISION);
