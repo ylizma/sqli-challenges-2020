@@ -1,57 +1,68 @@
 package challenges.cloudinfrastructure;
 
-public class Machine {
-    private String name;
-    private String system;
-    private int diskSize;
-    private int memorySize;
-    private MachineState state;
+import challenges.cloudinfrastructure.machibestate.InactiveState;
+import challenges.cloudinfrastructure.machibestate.MachineState;
+import challenges.cloudinfrastructure.machibestate.RunningState;
+import challenges.cloudinfrastructure.machibestate.StoppedState;
 
-    public Machine(String name, String system, String diskSize, String memorySize) {
-        this.name = name;
-        this.system = system;
-        this.state = MachineState.INACTIVE;
-        this.diskSize = Integer.parseInt(diskSize.substring(0,diskSize.indexOf("gb")));
-        this.memorySize = Integer.parseInt(memorySize.substring(0,memorySize.indexOf("gb")));
+public class Machine extends Storage {
+    private int disk;
+    private int memory;
+    private String operatingSystem;
+
+    private MachineState running, stopped, inactive;
+    private MachineState currentMachineState;
+
+    public Machine(String machineName, int disk, int memory, String operatingSystem) {
+        super(machineName);
+        this.disk = disk;
+        this.memory = memory;
+        this.operatingSystem = operatingSystem;
+//        init all the states
+        running = new RunningState(this);
+        stopped = new StoppedState(this);
+        inactive = new InactiveState(this);
+        currentMachineState = inactive;
     }
 
-    public String getName() {
-        return name;
+    public MachineState toRunning() {
+        return this.currentMachineState = running;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public MachineState toStopped() {
+        return this.currentMachineState = stopped;
     }
 
-    public String getSystem() {
-        return system;
+    public MachineState toInactive() {
+        return this.currentMachineState = inactive;
     }
 
-    public void setSystem(String system) {
-        this.system = system;
+    public void setCurrentMachineState(MachineState currentMachineState) {
+        this.currentMachineState = currentMachineState;
     }
 
-    public int getDiskSize() {
-        return diskSize;
+    public MachineState getCurrentMachineState() {
+        return currentMachineState;
     }
 
-    public void setDiskSize(int diskSize) {
-        this.diskSize = diskSize;
+    public int getDisk() {
+        return disk;
     }
 
-    public int getMemorySize() {
-        return memorySize;
+    public int getMemory() {
+        return memory;
     }
 
-    public void setMemorySize(int memorySize) {
-        this.memorySize = memorySize;
+
+    @Override
+    String print() {
+        StringBuilder builder = new StringBuilder(getStorageName());
+        builder.append(":").append(this.getCurrentMachineState().printState());
+        return builder.toString();
     }
 
-    public MachineState getState() {
-        return state;
-    }
-
-    public void setState(MachineState state) {
-        this.state = state;
+    @Override
+    public double usedDisk() {
+        return this.disk;
     }
 }

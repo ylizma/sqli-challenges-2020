@@ -1,77 +1,157 @@
 package challenges.cloudinfrastructure;
 
+import challenges.cloudinfrastructure.machibestate.RunningState;
+import challenges.cloudinfrastructure.machibestate.StoppedState;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CloudInfrastructure {
 
-    private List<CloudStore> cloudStores = new ArrayList<>();
-    private Cloudservice cloudservice = new CloudServiceImp();
-    private List<Machine> machines = new ArrayList<>();
+    //    List of cloudStores and Machines
+    List<Storage> storages;
+
+    public CloudInfrastructure() {
+        storages = new ArrayList<>();
+    }
 
     public void createStore(String storeName) throws CreateStoreException {
-        CloudStore cloudStore = new CloudStore(storeName);
-        boolean isExist = cloudservice.isStoreExist(cloudStore, cloudStores);
-        if (isExist) {
-            throw new CreateStoreException();
+        CloudStore managedStore = findCloudStoreByName(storeName);
+        if (managedStore == null) {
+            CloudStore cloudStore = new CloudStore(storeName);
+            storages.add(cloudStore);
         } else {
-            this.cloudStores.add(cloudStore);
+            throw new CreateStoreException("Store already exist !!");
+        }
+
+    }
+
+    public void uploadDocument(String storeName, String... myFiles) {
+        CloudStore cloudStore = findCloudStoreByName(storeName);
+        for (String file : myFiles) {
+            File currentFile = new File(file);
+            if (cloudStore != null) {
+                cloudStore.getFiles().add(currentFile);
+            }
         }
     }
 
-    public void uploadDocument(String storeName, String... files) {
-        cloudservice.uploadDocument(storeName, files, cloudStores);
+    public CloudStore findCloudStoreByName(String storeName) {
+        List<Storage> cloudstores = storages.stream().filter(storage -> storage instanceof CloudStore).collect(Collectors.toList());
+        for (Storage cloudStore : cloudstores) {
+            if (cloudStore.getStorageName().equals(storeName)) {
+                return (CloudStore) cloudStore;
+            }
+        }
+        return null;
     }
 
     public String listStores() {
+         List<Storage> cloudstores = storages.stream().filter(storage -> storage instanceof CloudStore).collect(Collectors.toList());
         StringBuilder result = new StringBuilder();
-        for (CloudStore cloudStore : cloudStores
-        ) {
-            result.append(cloudStore.toString())
+        for (Storage cloudStore : cloudstores) {
+            result.append(cloudStore.print())
                     .append("||");
         }
         return result.substring(0, result.length() - 2);
     }
 
     public void deleteStore(String storeName) {
-        cloudservice.deleteStore(storeName, cloudStores);
+        CloudStore store = findCloudStoreByName(storeName);
+        if (store != null) {
+            this.storages.remove(store);
+        }
     }
 
     public void emptyStore(String storeName) {
-        cloudservice.emptyStore(storeName, cloudStores);
+        CloudStore store = findCloudStoreByName(storeName);
+        if (store != null) {
+            store.getFiles().clear();
+        }
     }
 
-    public void createMachine(String name, String system, String diskSize, String memorySize) {
-        Machine machine = new Machine(name, system, diskSize, memorySize);
-        this.machines.add(machine);
+    public void createMachine(String machineName, String os, String disk, String memory) {
+        int machineDisk = Integer.parseInt(disk.substring(0, disk.indexOf("gb")));
+        int machineMemory = Integer.parseInt(memory.substring(0, memory.indexOf("gb")));
+        Machine machine = new Machine(machineName, machineDisk, machineMemory, os);
+        this.storages.add(machine);
     }
 
     public String listMachines() {
-        return cloudservice.listMachines(machines);
+        StringBuilder builder = new StringBuilder();
+        for (Storage machine : storages) {
+            builder.append(machine.print())
+                    .append("||");
+        }
+        return builder.substring(0, builder.length() - 2);
     }
 
     public void startMachine(String machineName) throws MachineStateException {
-        cloudservice.startMachine(machineName, machines);
+        Machine machine = findMachineByName(machineName);
+        if (machine != null) {
+            if (machine.getCurrentMachineState() instanceof RunningState)
+                throw new MachineStateException("machine already running");
+            machine.setCurrentMachineState(machine.toRunning());
+        }
+    }
+
+    private Machine findMachineByName(String storeName) {
+        List<Storage> machines = storages.stream().filter(storage -> storage instanceof Machine).collect(Collectors.toList());
+        for (Storage machine : machines) {
+            if (machine.getStorageName().equals(storeName)) {
+                return (Machine) machine;
+            }
+        }
+        return null;
     }
 
     public void stopMachine(String machineName) {
-        cloudservice.stopMachine(machineName, machines);
+        Machine machine = findMachineByName(machineName);
+        if (machine != null) {
+            machine.setCurrentMachineState(machine.toStopped());
+        }
     }
 
-    public double usedMemory(String machine1) {
-        return cloudservice.usedMemory(machine1,machines);
+    public int usedMemory(String machineName) {
+        Machine machine = findMachineByName(machineName);
+        if (machine != null) {
+            if (machine.getCurrentMachineState() instanceof RunningState) {
+                return  machine.getMemory();
+            } else{
+                return 0;
+            }
+        }
+        return -1;
     }
 
-    public double usedDisk(String machine1) {
-        return cloudservice.usedDisk(machine1,machines,cloudStores);
-
+    public double usedDisk(String storageName) {
+        Machine machine = findMachineByName(storageName);
+        if (machine != null) {
+            return machine.getDisk();
+        }
+        CloudStore store = findCloudStoreByName(storageName);
+        if (store != null) {
+            return store.usedDisk();
+        }
+        return -1;
     }
 
     public double globalUsedDisk() {
-        return cloudservice.globalDisk(machines);
+        double usedDisk = 0;
+        for (Storage storage : storages) {
+            usedDisk += storage.usedDisk();
+        }
+        return usedDisk;
     }
 
     public double globalUsedMemory() {
-        return cloudservice.globalMemory(machines);
+        double memory = 0;
+        List<Storage> cloudstores = storages.stream().filter(storage -> storage instanceof Machine).collect(Collectors.toList());
+        for (Storage cloudStore : cloudstores) {
+            System.out.println(this.usedMemory(cloudStore.getStorageName()));
+            memory += this.usedMemory(cloudStore.getStorageName());
+        }
+        return memory;
     }
 }

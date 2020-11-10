@@ -1,8 +1,7 @@
 package challenges.cloudinfrastructure;
 
 public class CreateStoreException extends Exception {
-
-    public CreateStoreException() {
-        super();
+    public CreateStoreException(String message) {
+        super(message);
     }
 }

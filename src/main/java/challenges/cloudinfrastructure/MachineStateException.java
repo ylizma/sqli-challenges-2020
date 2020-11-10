@@ -1,7 +1,7 @@
 package challenges.cloudinfrastructure;
 
 public class MachineStateException extends Exception {
-    public MachineStateException() {
-        super();
+    public MachineStateException(String s) {
+        super(s);
     }
 }

@@ -54,7 +54,7 @@ public class CloudInfrastructureTest {
         String expected = "myFiles:empty||myImages:picture.jpeg, profile.png"; // an empty store is display as "empty"
         assertEquals(expected, cloud.listStores());
     }
-
+//
     /**
      * We can also delete or empty a store. When a store does not contain any documents, "empty" is
      * displayed.
@@ -71,16 +71,16 @@ public class CloudInfrastructureTest {
         cloud.emptyStore("myImages"); // empty a store
         assertEquals("myImages:empty", cloud.listStores()); // an empty store is display as "empty"
     }
-//
+////
     /**
      * The creation of a store with a name that is already used will throw the CreateStoreException.
      */
     @Test
-    public void cannot_create_stores_with_same_names() throws CreateStoreException {
+    public void cannot_create_stores_with_same_names() throws CreateStoreException, CreateStoreException {
         cloud.createStore("myFiles");
         assertThrows(CreateStoreException.class,()->{cloud.createStore("myFiles");});// will throw the exception
     }
-//
+////
     /**
      * We move here to the second part of the test, virtual machines (VM). We can create several VMs
      * in the cloud. Each VM can have three possible statuses : Inactive, Running or Stopped. A new
@@ -102,7 +102,7 @@ public class CloudInfrastructureTest {
         cloud.stopMachine("machine1"); // stop machine "machine1"
         assertEquals("machine1:stopped||machine2:running", cloud.listMachines());
     }
-//
+////
     /**
      * Trying to start an already running VM will throw a MachineStateException
      */
@@ -117,7 +117,7 @@ public class CloudInfrastructureTest {
             cloud.startMachine("machine1");
         });// will throw the exception
     }
-
+//
     /**
      * For every VM, we can check the used Disk and memory. The memory is consumed only when a
      * machine is running. The disk size is always used, even if the VM is not running.
@@ -134,13 +134,13 @@ public class CloudInfrastructureTest {
         assertEquals(50, cloud.usedDisk("machine1"), PRECISION);
         // as the machine is now running, all its memory is used.
         assertEquals(8, cloud.usedMemory("machine1"), PRECISION);
-//
+////
         cloud.stopMachine("machine1");
         assertEquals(50, cloud.usedDisk("machine1"), PRECISION);
         // The memory will be released as the machine has been stopped
         assertEquals(0, cloud.usedMemory("machine1"), PRECISION);
     }
-//
+////
     /**
      * Same as VMs, we can check the used disk in a storage. A storage does not consume any memory,
      * only disk space.
@@ -163,7 +163,7 @@ public class CloudInfrastructureTest {
         // 2 documents, used disk = 200mb
         assertEquals(0.200, cloud.usedDisk("myImages"), PRECISION);
     }
-//
+////
     /**
      * In this test, we can check the used disk and used memory of all machines and stores existing
      * in the cloud.
@@ -179,11 +179,12 @@ public class CloudInfrastructureTest {
         // for now 2 machines exists, with 50gb and 20gb disk sizes = 70gb
         assertEquals(70, cloud.globalUsedDisk(), PRECISION);
         assertEquals(0, cloud.globalUsedMemory(), PRECISION); // machines are inactive, no memory is used
-
+//
         cloud.startMachine("machine1");
+        assertEquals(8,cloud.usedMemory("machine1"));
         assertEquals(70, cloud.globalUsedDisk(), PRECISION);
         assertEquals(8, cloud.globalUsedMemory(), PRECISION);
-//
+////
         cloud.startMachine("machine2");
         assertEquals(70, cloud.globalUsedDisk(), PRECISION);
         assertEquals(12, cloud.globalUsedMemory(), PRECISION);
@@ -191,17 +192,17 @@ public class CloudInfrastructureTest {
         cloud.createStore("myImages");
         cloud.uploadDocument("myImages", "picture.jpeg");
         assertEquals("myImages:picture.jpeg", cloud.listStores());
-//
-        assertEquals(70, cloud.globalUsedDisk(), PRECISION);
+////
+        assertEquals(70.1, cloud.globalUsedDisk(), PRECISION);
         assertEquals(12, cloud.globalUsedMemory(), PRECISION);
-//
+////
         cloud.stopMachine("machine1");
         assertEquals(70.100, cloud.globalUsedDisk(), PRECISION);
         assertEquals(4, cloud.globalUsedMemory(), PRECISION);
 
-//        cloud.emptyStore("myImages");
-//        assertEquals(70, cloud.globalUsedDisk(), PRECISION);
-//        assertEquals(4, cloud.globalUsedMemory(), PRECISION);
+        cloud.emptyStore("myImages");
+        assertEquals(70, cloud.globalUsedDisk(), PRECISION);
+        assertEquals(4, cloud.globalUsedMemory(), PRECISION);
     }
 
     // Used only to compare double, you can totally ignored it

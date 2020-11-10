@@ -57,7 +57,8 @@ public class DateFormat {
                 StringBuilder newDate = new StringBuilder(date.split(" ")[2]);
                 newDate.append("-")
                         .append(month)
-                        .append("-").append(day);
+                        .append("-")
+                        .append(day);
                 outputMon.add(newDate.toString());
             } else {
                 System.out.println("invalid date !!");

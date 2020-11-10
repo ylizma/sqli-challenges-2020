@@ -36,10 +36,10 @@ public class Hotel {
                 if (participant instanceof Tringa) {
                     if (currentStandardRoomsTicket > maxStandardRoomsTicket) {
                         participant.setRoom("Apart room N°" +
-                                currentAppartmentTicket+1);
+                                this.participants.size()+1);
                         currentAppartmentTicket++;
                     } else {
-                        participant.setRoom("Standard room N°" + currentStandardRoomsTicket+1);
+                        participant.setRoom("Standard room N°" + this.participants.size()+1);
                         currentStandardRoomsTicket++;
                     }
 

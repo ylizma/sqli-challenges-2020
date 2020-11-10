@@ -21,7 +21,9 @@ public class Event {
             return false;
         } else {
             Participant participant = HotelFactory.getParticipant(role, name);
-            participant.setRole(role);
+            if (participant != null) {
+                participant.setRole(role);
+            }
             hotel.setRooms(name);
             this.participants.add(participant);
             return true;
