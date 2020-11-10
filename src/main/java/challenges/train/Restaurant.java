@@ -1,8 +1,13 @@
 package challenges.train;
 
-public class Restaurant implements Wagon {
+public class Restaurant extends TrainDecorator {
+
+    public Restaurant(Wagon wagon) {
+        super(wagon);
+    }
+
     @Override
-    public String getWagon() {
-        return "|hThT|";
+    public String print() {
+        return wagon.print() + "|hThT|";
     }
 }

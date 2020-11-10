@@ -1,8 +1,12 @@
 package challenges.train;
 
-public class Passenger implements Wagon {
-    @Override
-    public String getWagon() {
-        return "|OOOO|";
+public class Passenger extends TrainDecorator {
+
+    public Passenger(Wagon wagon) {
+        super(wagon);
+    }
+
+    public String print() {
+        return wagon.print() + "|OOOO|";
     }
 }

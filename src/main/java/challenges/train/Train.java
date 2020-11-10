@@ -9,19 +9,21 @@ public class Train {
 
     public Train(String wagons) {
         for (int i = 0; i < wagons.length(); i++) {
+            Wagon wagon = null;
             if (wagons.charAt(i) == 'H') {
                 if (this.wagons.size() > 1) {
-                    this.wagons.add(new Head(true));
+                    wagon = new LastHead(new BasicTrain());
                 } else {
-                    this.wagons.add(new Head(false));
+                    wagon = new Head(new BasicTrain());
                 }
             } else if (wagons.charAt(i) == 'P') {
-                this.wagons.add(new Passenger());
+                wagon = new Passenger(new BasicTrain());
             } else if (wagons.charAt(i) == 'R') {
-                this.wagons.add(new Restaurant());
+                wagon = new Restaurant(new BasicTrain());
             } else if (wagons.charAt(i) == 'C') {
-                this.wagons.add(new Cargo(false));
+                wagon = new EmptyCargo(new BasicTrain());
             }
+            this.wagons.add(wagon);
         }
     }
 
@@ -29,7 +31,7 @@ public class Train {
         StringBuilder result = new StringBuilder();
         for (Wagon wagon : this.wagons
         ) {
-            result.append(wagon.getWagon());
+            result.append(wagon.print());
             result.append("::");
         }
         return result.substring(0, result.length() - 2);
@@ -44,15 +46,14 @@ public class Train {
     }
 
     public boolean fill() {
+        int i = 0;
         for (Wagon wagon : wagons
         ) {
-            if (wagon instanceof Cargo) {
-                Cargo cargo = (Cargo) wagon;
-                if (!cargo.isFilled()) {
-                    cargo.setFilled(true);
-                    return true;
-                }
+            if (wagon instanceof EmptyCargo) {
+                wagons.set(i, new FilledCargo(new BasicTrain()));
+                return true;
             }
+            i++;
         }
         return false;
     }

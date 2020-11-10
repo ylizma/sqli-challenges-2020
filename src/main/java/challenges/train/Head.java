@@ -1,16 +1,13 @@
 package challenges.train;
 
-public class Head implements Wagon {
+public class Head extends TrainDecorator {
 
-    private boolean isTail;
-
-    public Head(boolean isTail) {
-        this.isTail = isTail;
+    public Head(Wagon wagon) {
+        super(wagon);
     }
 
     @Override
-    public String getWagon() {
-        return (isTail) ? "HHHH>" : "<HHHH";
+    public String print() {
+        return wagon.print()+"<HHHH";
     }
-
 }
