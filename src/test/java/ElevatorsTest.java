@@ -85,13 +85,13 @@ public class ElevatorsTest {
         assertEquals("id1", idOfFirstAvailableElevator);
     }
 
-//    @Test
-//    public void can_request_elevator_in_middle_of_building() {
-//        Building building = new Building(10, "id1:1", "id2:6");
-//
-//        String idOfFirstAvailableElevator = building.requestElevator(5); // the request is made at the 5th floor
-//
-//        assertEquals("id2", idOfFirstAvailableElevator); // "id2" is the closest elevator to 5th floor
-//    }
+    @Test
+    public void can_request_elevator_in_middle_of_building() {
+        Building building = new Building(10, "id1:1", "id2:6");
+
+        String idOfFirstAvailableElevator = building.requestElevator(5); // the request is made at the 5th floor
+
+        assertEquals("id2", idOfFirstAvailableElevator); // "id2" is the closest elevator to 5th floor
+    }
 
 }
